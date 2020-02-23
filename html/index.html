@@ -14,11 +14,16 @@
 
     <script>
         var draggedElement;
+        var mouseDownX;
+        var mouseDownY;
+        var mouseDownElementX;
+        var mouseDownElementY;
 
         function addNode(url) {
             var container = document.getElementById("img-container");
             var newImage = document.createElement("img");
             newImage.setAttribute("src", url);
+            newImage.setAttribute("draggable", false);
             newImage.className = "node";
             newImage.addEventListener('mousedown', mouseDown, false);
             container.appendChild(newImage);
@@ -35,7 +40,6 @@
                     addNode(url);
                 }
             });
-
         }
 
         function mouseUp() {
@@ -45,14 +49,19 @@
 
         function mouseDown(event) {
             draggedElement = event.target;
+            mouseDownElementX = draggedElement.x;
+            mouseDownElementY = draggedElement.y;
+            mouseDownX = event.clientX;
+            mouseDownY = event.clientY;
             window.addEventListener('mousemove', divMove, true);
         }
 
         function divMove(event) {
             var div = draggedElement;
-            div.style.position = 'absolute';
-            div.style.top = event.clientY + 'px';
-            div.style.left = event.clientX + 'px';
+            var mouseXDiff = event.clientX - mouseDownX;
+            var mouseYDiff = event.clientY - mouseDownY;
+            div.style.top = mouseDownElementY + mouseYDiff + 'px';
+            div.style.left = mouseDownElementX + mouseXDiff + 'px';
         }
     </script>
 </head>
