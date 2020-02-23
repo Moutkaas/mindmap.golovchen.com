@@ -9,6 +9,25 @@
             border-radius: 50%;
             position: absolute;
             border: 2px solid #73AD21;
+            z-index: 10;
+        }
+
+        #svg{
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        line{
+            stroke-width:2px;
+            stroke:rgb(0,0,0);
+        }
+
+        #img-url-input {
+            z-index: 2;
         }
     </style>
 
@@ -18,6 +37,9 @@
         var mouseDownY;
         var mouseDownElementX;
         var mouseDownElementY;
+        var wasDragged = false;
+        var lineFromElement = null;
+        var lines = [];
 
         function addNode(url) {
             var container = document.getElementById("img-container");
@@ -26,6 +48,7 @@
             newImage.setAttribute("draggable", false);
             newImage.className = "node";
             newImage.addEventListener('mousedown', mouseDown, false);
+
             container.appendChild(newImage);
         }
 
@@ -42,12 +65,61 @@
             });
         }
 
+        function updateLineCoordinates(fromElement, toElement, newLine) {
+            var x1 = fromElement.offsetLeft + fromElement.width / 2;
+            var y1 = fromElement.offsetTop + fromElement.height / 2;
+            var x2 = toElement.offsetLeft + toElement.width / 2;
+            var y2 = toElement.offsetTop + toElement.width / 2;
+
+            newLine.setAttribute('x1', x1);
+            newLine.setAttribute('y1', y1);
+            newLine.setAttribute('x2', x2);
+            newLine.setAttribute('y2', y2);
+        }
+
+        function addLine(fromElement, toElement) {
+
+            var newLine = document.createElementNS('http://www.w3.org/2000/svg','line');
+
+            updateLineCoordinates(fromElement, toElement, newLine);
+
+            document.getElementById("svg").appendChild(newLine);
+
+            lines.push({
+                from: fromElement,
+                to: toElement,
+                line: newLine
+            });
+        }
+
+        function updateLines() {
+            lines.forEach(line => {
+                updateLineCoordinates(line.from, line.to, line.line);
+            });
+        }
+
         function mouseUp() {
+            if (draggedElement == null) {
+                return;
+            }
+            if (!wasDragged) {
+                if (lineFromElement == null)  {
+                    lineFromElement = draggedElement;
+                } else {
+                    addLine(lineFromElement, draggedElement);
+                    lineFromElement = null;
+                }
+            }
             window.removeEventListener('mousemove', divMove, true);
             draggedElement = null;
+            wasDragged = false;
+            updateLines();
         }
 
         function mouseDown(event) {
+            if (event.target.tagName.toLowerCase() !== 'img') {
+                return;
+            }
             draggedElement = event.target;
             mouseDownElementX = draggedElement.x;
             mouseDownElementY = draggedElement.y;
@@ -62,16 +134,21 @@
             var mouseYDiff = event.clientY - mouseDownY;
             div.style.top = mouseDownElementY + mouseYDiff + 'px';
             div.style.left = mouseDownElementX + mouseXDiff + 'px';
+            if (!wasDragged && mouseXDiff != 0 || mouseYDiff != 0) {
+                wasDragged = true;
+            }
         }
     </script>
 </head>
 <body onload="addListeners()">
 
-<input id="img-url-input" style="width: 100%" type="text">
+<input id="img-url-input" name="img-url-input" style="width: 100%" type="text" value="https://picsum.photos/200">
 <br><br>
 
 <div id="img-container" style="width: 100%; height: 1000px">
 </div>
+<svg id="svg">
+</svg>
 
 </body>
 </html>
