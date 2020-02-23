@@ -92,7 +92,7 @@
             });
         }
 
-        function updateLines() {
+        function redrawLines() {
             lines.forEach(line => {
                 updateLineCoordinates(line.from, line.to, line.line);
             });
@@ -113,7 +113,7 @@
             window.removeEventListener('mousemove', divMove, true);
             draggedElement = null;
             wasDragged = false;
-            updateLines();
+            redrawLines();
         }
 
         function mouseDown(event) {
