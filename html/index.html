@@ -137,6 +137,9 @@
             if (!wasDragged && mouseXDiff != 0 || mouseYDiff != 0) {
                 wasDragged = true;
             }
+            if (wasDragged) {
+                redrawLines();
+            }
         }
     </script>
 </head>
