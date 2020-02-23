@@ -1,0 +1,68 @@
+<html>
+<head>
+    <title>Mind Map</title>
+
+    <style>
+        .node {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            position: absolute;
+            border: 2px solid #73AD21;
+        }
+    </style>
+
+    <script>
+        var draggedElement;
+
+        function addNode(url) {
+            var container = document.getElementById("img-container");
+            var newImage = document.createElement("img");
+            newImage.setAttribute("src", url);
+            newImage.className = "node";
+            newImage.addEventListener('mousedown', mouseDown, false);
+            container.appendChild(newImage);
+        }
+
+        function addListeners() {
+            window.addEventListener('mouseup', mouseUp, false);
+
+            var imgUrlInput = document.getElementById("img-url-input");
+            imgUrlInput.addEventListener("keyup", function(event) {
+                event.preventDefault();
+                if (event.keyCode === 13) {
+                    var url = imgUrlInput.value;
+                    addNode(url);
+                }
+            });
+
+        }
+
+        function mouseUp() {
+            window.removeEventListener('mousemove', divMove, true);
+            draggedElement = null;
+        }
+
+        function mouseDown(event) {
+            draggedElement = event.target;
+            window.addEventListener('mousemove', divMove, true);
+        }
+
+        function divMove(event) {
+            var div = draggedElement;
+            div.style.position = 'absolute';
+            div.style.top = event.clientY + 'px';
+            div.style.left = event.clientX + 'px';
+        }
+    </script>
+</head>
+<body onload="addListeners()">
+
+<input id="img-url-input" style="width: 100%" type="text">
+<br><br>
+
+<div id="img-container" style="width: 100%; height: 1000px">
+</div>
+
+</body>
+</html>
