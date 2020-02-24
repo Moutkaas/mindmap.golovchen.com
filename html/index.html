@@ -125,15 +125,18 @@
 
             var x1 = lineFromElement.offsetLeft + lineFromElement.width / 2;
             var y1 = lineFromElement.offsetTop + lineFromElement.height / 2;
-            var x2 = event.clientX;
-            var y2 = event.clientY;
+            if (event.target.tagName.toLowerCase() === 'img') {
+                var x2 = event.target.offsetLeft + event.target.width / 2;
+                var y2 = event.target.offsetTop + event.target.width / 2;
+            } else {
+                var x2 = event.clientX;
+                var y2 = event.clientY;
+            }
 
             newLine.setAttribute('x1', x1);
             newLine.setAttribute('y1', y1);
             newLine.setAttribute('x2', x2);
             newLine.setAttribute('y2', y2);
-
-
         }
 
         function mouseUp() {
