@@ -102,17 +102,46 @@
             });
         }
 
+        function onNodeClick() {
+            if (lineFromElement == null) {
+                lineFromElement = draggedElement;
+
+                var newLine = document.createElementNS('http://www.w3.org/2000/svg','line');
+                newLine.setAttribute('id', 'mouseLine');
+
+                document.getElementById("svg").appendChild(newLine);
+
+                window.addEventListener('mousemove', onMouseMoveDrawLine, true);
+            } else {
+                addLine(lineFromElement, draggedElement);
+                window.removeEventListener('mousemove', onMouseMoveDrawLine, true);
+                document.getElementById('mouseLine').remove();
+                lineFromElement = null;
+            }
+        }
+
+        function onMouseMoveDrawLine(event) {
+            var newLine = document.getElementById('mouseLine');
+
+            var x1 = lineFromElement.offsetLeft + lineFromElement.width / 2;
+            var y1 = lineFromElement.offsetTop + lineFromElement.height / 2;
+            var x2 = event.clientX;
+            var y2 = event.clientY;
+
+            newLine.setAttribute('x1', x1);
+            newLine.setAttribute('y1', y1);
+            newLine.setAttribute('x2', x2);
+            newLine.setAttribute('y2', y2);
+
+
+        }
+
         function mouseUp() {
             if (draggedElement == null) {
                 return;
             }
             if (!wasDragged) {
-                if (lineFromElement == null)  {
-                    lineFromElement = draggedElement;
-                } else {
-                    addLine(lineFromElement, draggedElement);
-                    lineFromElement = null;
-                }
+                onNodeClick();
             }
             window.removeEventListener('mousemove', divMove, true);
             draggedElement = null;
