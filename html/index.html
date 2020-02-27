@@ -4,8 +4,6 @@
 
     <style>
         .node {
-            width: 100px;
-            height: 100px;
             border-radius: 50%;
             position: absolute;
             border: 2px solid black;
@@ -14,6 +12,30 @@
 
         .node:hover {
             border: 2px solid rgba(120, 255, 188, 1);
+        }
+
+        .node-1 {
+            width: 200px;
+            height: 200px;
+        }
+
+        .node-2 {
+            width: 130px;
+            height: 130px;
+        }
+
+        .node-3 {
+            width: 80px;
+            height: 80px;
+        }
+
+        .node-4 {
+            width: 50px;
+            height: 50px;
+        }
+        .node-5 {
+            width: 30px;
+            height: 30px;
         }
 
         #svg {
@@ -32,10 +54,58 @@
 
         #img-url-input {
             z-index: 2;
+            font-family: "Lucida Console", Monaco, monospace;
+            font-size: 16px;
+        }
+
+        .show {
+            z-index: 1000;
+            position: absolute;
+            background-color: #C0C0C0;
+            border: 1px solid blue;
+            padding: 2px;
+            display: block;
+            margin: 0;
+            list-style-type: none;
+            list-style: none;
+        }
+
+        .hide {
+            display: none;
+        }
+
+        .show li {
+            list-style: none;
+        }
+
+        .show a {
+            border: 0 !important;
+            text-decoration: none;
+        }
+
+        .show a:hover {
+            text-decoration: underline !important;
         }
     </style>
 
     <script>
+        function onDelete() {
+            let unpairedLinesMatcher = line => line.from !== currentRMenuTarget && line.to !== currentRMenuTarget;
+            lines.filter(line => !unpairedLinesMatcher(line)).forEach(line => line.line.remove());
+            lines = lines.filter(unpairedLinesMatcher);
+            currentRMenuTarget.remove();
+        }
+
+    function onSetSize(size) {
+            currentRMenuTarget.classList.remove('node-1');
+            currentRMenuTarget.classList.remove('node-2');
+            currentRMenuTarget.classList.remove('node-3');
+            currentRMenuTarget.classList.remove('node-4');
+            currentRMenuTarget.classList.remove('node-5');
+
+            currentRMenuTarget.classList.add('node-' + size);
+        }
+
         var draggedElement;
         var mouseDownX;
         var mouseDownY;
@@ -44,14 +114,27 @@
         var wasDragged = false;
         var lineFromElement = null;
         var lines = [];
+        var currentRMenuTarget = null;
+
+        function onMouseLeaveRMenu(param) {
+            document.getElementById("rmenu").className = "hide";
+        }
 
         function addNode(url) {
             var container = document.getElementById("img-container");
             var newImage = document.createElement("img");
             newImage.setAttribute("src", url);
             newImage.setAttribute("draggable", false);
-            newImage.className = "node";
+            newImage.className = "node node-1";
             newImage.addEventListener('mousedown', mouseDown, false);
+
+            newImage.addEventListener('contextmenu', function(event) {
+                document.getElementById("rmenu").className = "show";
+                document.getElementById("rmenu").style.top = event.clientY + 'px';
+                document.getElementById("rmenu").style.left = event.clientX + 'px';
+                currentRMenuTarget = event.target;
+                event.preventDefault();
+            }, false);
 
             container.appendChild(newImage);
         }
@@ -181,13 +264,37 @@
 </head>
 <body onload="addListeners()">
 
-<input id="img-url-input" name="img-url-input" style="width: 100%" type="text" value="https://picsum.photos/200">
+<input id="img-url-input" name="img-url-input" placeholder="https://example.com/image.jpg" style="width: 100%" type="text" value="https://picsum.photos/200">
 <br><br>
 
 <div id="img-container" style="width: 100%; height: 1000px">
 </div>
 <svg id="svg">
 </svg>
+
+<!-- initially hidden right-click menu -->
+<div class="hide" id="rmenu" onmouseleave="onMouseLeaveRMenu(this)">
+    <ul>
+        <li>
+            <button onclick="onSetSize(1)">Size = 1</button>
+        </li>
+        <li>
+            <button href="" onclick="onSetSize(2)">Size = 2</button>
+        </li>
+        <li>
+            <button href="" onclick="onSetSize(3)">Size = 3</button>
+        </li>
+        <li>
+            <button href="" onclick="onSetSize(4)">Size = 4</button>
+        </li>
+        <li>
+            <button href="" onclick="onSetSize(5)">Size = 5</button>
+        </li>
+        <li>
+            <button href="" onclick="onDelete()">Remove</button>
+        </li>
+    </ul>
+</div>
 
 </body>
 </html>
